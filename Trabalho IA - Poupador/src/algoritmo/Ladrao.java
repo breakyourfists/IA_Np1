@@ -6,29 +6,27 @@ import java.util.Random;
 public class Ladrao extends ProgramaLadrao {
 
 	private int direcao;
-	private Random rd;
-
 	private final int CIMA=7, BAIXO=16,ESQUERDA=11, DIREITA=12;
+	private Random rd;
 	private final int[] direcoes = new int[] { CIMA, BAIXO, ESQUERDA, DIREITA };
-
 	ArrayList<Point> historico = new ArrayList<>();
 
 	public Ladrao() {
 		super();
 		rd = new Random();
 
-		direcao = direcoes[rd.nextInt(3)];
+		direcao = direcoes[0];
 	}
 
 
 	public int acao() {
 		int posPoupador = getPoupadorPorVisao();
 
-		if (posPoupador != -1) {
+		if (posPoupador != -999) {
 			direcao = seguirPorVisao(posPoupador);
 
 		} else {
-			if ((posPoupador = getPoupadorPorCheiro()) != -1) {
+			if ((posPoupador = getPoupadorPorCheiro()) != -999) {
 				direcao = seguirPorCheiro(posPoupador);
 			} else {
 				direcao = alteraSentido();
@@ -37,9 +35,8 @@ public class Ladrao extends ProgramaLadrao {
 
 		historico.add(sensor.getPosicao());
 
-		if(isPreso()){
+		if(isPreso())
 			direcao = alteraSentido();
-		}
 
 		return caminhar(direcao);
 	}
@@ -53,16 +50,12 @@ public class Ladrao extends ProgramaLadrao {
 				return i;
 			}
 		}
-		return -1;
+		return -999;
 	}
 
 	private boolean isObstaculo(int pos) {
 		int[] visao = sensor.getVisaoIdentificacao();
-		if (visao[pos] != 0) {
-			return true;
-		} else {
-			return false;
-		}
+		return visao[pos] != 0;
 	}
 
 	private int caminhar(int andar) {
@@ -82,7 +75,7 @@ public class Ladrao extends ProgramaLadrao {
 	private int getPoupadorPorCheiro() {
 		int[] cheiro = sensor.getAmbienteOlfatoPoupador();
 		int menorCheiro = 6;
-		int retorno = -1;
+		int retorno = -999;
 		for (int i = 0; i < cheiro.length; i++) {
 			if (cheiro[i] < menorCheiro && cheiro[i] != 0 && cheiro[i] != -1) {
 				menorCheiro = cheiro[i];
@@ -167,15 +160,13 @@ public class Ladrao extends ProgramaLadrao {
 	}
 
 	private boolean isVertical(int pos) {
-		if (pos == CIMA || pos == BAIXO)
-			return true;
-		return false;
+		return pos == CIMA || pos == BAIXO;
 	}
 
 	private boolean isPreso() {
 		int contador=0;
-		if(historico.size()>200)
-			historico = new ArrayList<>();
+		if(historico.size()>400)
+			historico.clear();
 
 		int tamanho = historico.size();
 
